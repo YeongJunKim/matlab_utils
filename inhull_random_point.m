@@ -7,7 +7,7 @@ for i = 1:n
     middle = mean(p,1);
     while(1)
         
-        nomi = normrnd(middle, 2);
+        nomi = normrnd(middle, 1);
         kkk = convhulln(p);
         in = inhull(nomi, p, kkk);
         if(in == 1)
