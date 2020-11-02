@@ -27,18 +27,35 @@ classdef lidaring < handle
         result_mean = [];
         result_now = [];
         
+        result_data_distance_angle = [];
+        
         step = 0;
+        %% option
+        opt_figure = 1;
         
         %% class info
         namespace = "";
         fig;
+        ax;
         is_init = "no";
     end
     methods
         %% init
-        function obj = lidaring_init(obj, namespace, angle_interval, time_interval, robot_num, range)
+        function obj = lidaring(namespace, angle_interval, time_interval, robot_num, range)
             obj.namespace = strcat(namespace,"/scan");
-            obj.fig             = figure('Name', obj.namespace);
+%             obj.fig             = figure('Name', obj.namespace);
+
+            if(obj.namespace == "/tb3c/scan")
+                obj.fig = figure(200);
+            elseif(obj.namespace == "/tb3d/scan")
+                obj.fig = figure(201);
+            elseif(obj.namespace == "/tb3e/scan")
+                obj.fig = figure(202);
+            elseif(obj.namespace == "/tb3f/scan")
+                obj.fig = figure(203);
+            end
+            obj.ax = axes;
+            clf;
             obj.angle_interval  = angle_interval;
             obj.time_interval   = time_interval;
             obj.robot_num       = robot_num;
@@ -55,13 +72,23 @@ classdef lidaring < handle
             obj.step = 1;
             obj.result_data = zeros(2, obj.robot_num, size);
             obj.result_data(:,:,1) = init;
+            for i = 1:obj.robot_num
+                obj.result_data_distance_angle(1,i,obj.step) = norm(obj.result_data(:,i,obj.step));
+                obj.result_data_distance_angle(2,i,obj.step) = atan2(obj.result_data(2,i,obj.step), obj.result_data(1,i,obj.step));
+            end
             r = "ok";
         end
+        function r = option(obj, type, value)
+           if strcmp(type, "figure")
+                obj.opt_figure = value;
+           else
+           end
+        end
         %% run
-        function r = lidaring_run(obj, time_interval, scan_data, tracking_position, theta)
+        function r = lidaring_run(obj,scan_data)
             if(obj.step < obj.history_size)
                 obj.step = obj.step+1;
-                obj.scan_data = scan_data;
+                obj.scan_data = scan_data;                
                 scan = lidarScan(scan_data, deg2rad(1:360));
                 obj.interested_scan = removeInvalidData(scan, 'RangeLimits', obj.lidar_range);
                 %             disp(interested_scan.Count)
@@ -124,10 +151,13 @@ classdef lidaring < handle
                     end
                         
                     dist = norm(obj.result_data(:,i,obj.step) - obj.result_data(:,i,obj.step -1));
-                    if dist > time_interval * 0.22 * 4
+                    if dist > obj.time_interval * 0.22 / 2
                        disp("[lidaring.m] Scan error");
                        obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step -1);
                     end
+                % convert distance and atan2 angles
+                obj.result_data_distance_angle(1,i,obj.step) = norm(obj.result_data(:,i,obj.step));
+                obj.result_data_distance_angle(2,i,obj.step) = atan2(obj.result_data(2,i,obj.step), obj.result_data(1,i,obj.step));
                 end
                 
                 
@@ -135,14 +165,16 @@ classdef lidaring < handle
                 
                 %% Based on known robot dynamics expected position is?
                 
-                if(obj.namespace == "/tb3a/sca1n")
+%                 if(obj.namespace == "/tb3c/scan")
+                    if obj.opt_figure
                     lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
-                elseif(obj.namespace == "/tb3b/sc1an")
-                    lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
-                elseif(obj.namespace == "/tb3c/s1can")
-                    lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
-                end
-            else
+                    end
+%                 elseif(obj.namespace == "/tb3d/scan")
+%                     lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
+%                 elseif(obj.namespace == "/tb3e/scan")
+%                     lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
+%                 end
+            else 
                 disp("[lidaring.m] Lidar over history");
             end
             
@@ -163,8 +195,8 @@ classdef lidaring < handle
             temp(:) = radius;
             viscircles(obj.result_data(:, :, obj.step)', temp);
             
-            xlim([-1 1]);
-            ylim([-1 1]);
+            xlim([-3 3]);
+            ylim([-3 3]);
             grid on;
         end
         function r = lidaring_draw_circle(obj, radius)
