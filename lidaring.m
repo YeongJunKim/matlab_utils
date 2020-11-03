@@ -107,7 +107,7 @@ classdef lidaring < handle
                 else
                     disp("[lidaring.m] More than one objects detected ")
                     Z = linkage(obj.interested_scan.Cartesian, 'single');
-                    C = cluster(Z, 'cutoff', 0.15, 'criterion','distance');
+                    C = cluster(Z, 'cutoff', 0.2, 'criterion','distance');
                     
                     obj.detected_num = max(C);
                     obj.result_Cartesian = obj.interested_scan.Cartesian;
@@ -145,14 +145,15 @@ classdef lidaring < handle
                     obj.result_data(:,i,obj.step) = obj.result_mean(:,col);
                     obj.result_now = obj.result_mean(:,col);
                     
-                    if norm(obj.result_data(:,i,obj.step)) < 0.15
+                    if norm(obj.result_data(:,i,obj.step)) < 0.2
                     obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step-1);
                     obj.result_now = obj.result_data(:,i,obj.step);
                     end
                         
                     dist = norm(obj.result_data(:,i,obj.step) - obj.result_data(:,i,obj.step -1));
-                    if dist > obj.time_interval * 0.22 / 2
+                    if dist > obj.time_interval * 0.22 
                        disp("[lidaring.m] Scan error");
+                       fprintf("robot num: %d target index: %d \n", obj.robot_num, i);
                        obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step -1);
                     end
                 % convert distance and atan2 angles
