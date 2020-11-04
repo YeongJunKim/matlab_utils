@@ -99,13 +99,13 @@ classdef lidaring < handle
                     obj.result_data(:,:,obj.step) = obj.result_data(:,:,obj.step - 1);
                     
                 elseif(obj.interested_scan.Count == 1)
-                    disp("[lidaring.m] One object detected ")
+%                     disp("[lidaring.m] One object detected ")
                     obj.detected_num = 1;
                     obj.result_Cartesian = obj.interested_scan.Cartesian;
                     obj.result_Cluster = [1];
                     obj.result = [obj.result_Cartesian obj.result_Cluster];
                 else
-                    disp("[lidaring.m] More than one objects detected ")
+%                     disp("[lidaring.m] More than one objects detected ")
                     Z = linkage(obj.interested_scan.Cartesian, 'single');
                     C = cluster(Z, 'cutoff', 0.2, 'criterion','distance');
                     
@@ -151,7 +151,7 @@ classdef lidaring < handle
                     end
                         
                     dist = norm(obj.result_data(:,i,obj.step) - obj.result_data(:,i,obj.step -1));
-                    if dist > obj.time_interval * 0.22 
+                    if dist > obj.time_interval 
                        disp("[lidaring.m] Scan error");
                        fprintf("robot num: %d target index: %d \n", obj.robot_num, i);
                        obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step -1);
@@ -168,7 +168,7 @@ classdef lidaring < handle
                 
 %                 if(obj.namespace == "/tb3c/scan")
                     if obj.opt_figure
-                    lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
+                    lidaring_draw_now_prediction(obj, 1, obj.time_interval);
                     end
 %                 elseif(obj.namespace == "/tb3d/scan")
 %                     lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
