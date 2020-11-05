@@ -32,7 +32,8 @@ classdef lidaring < handle
         step = 0;
         %% option
         opt_figure = 1;
-        
+        opt_circle_size = 0.3;
+        opt_weight = 1;
         %% class info
         namespace = "";
         fig;
@@ -81,6 +82,10 @@ classdef lidaring < handle
         function r = option(obj, type, value)
            if strcmp(type, "figure")
                 obj.opt_figure = value;
+           elseif strcmp(type, "circle size")
+               obj.opt_circle_size = value;
+           elseif strcmp(type, "weight")
+               obj.opt_weight = value;
            else
            end
         end
@@ -151,7 +156,7 @@ classdef lidaring < handle
                     end
                         
                     dist = norm(obj.result_data(:,i,obj.step) - obj.result_data(:,i,obj.step -1));
-                    if dist > obj.time_interval 
+                    if dist > obj.time_interval * obj.opt_weight;
                        disp("[lidaring.m] Scan error");
                        fprintf("robot num: %d target index: %d \n", obj.robot_num, i);
                        obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step -1);
@@ -168,7 +173,7 @@ classdef lidaring < handle
                 
 %                 if(obj.namespace == "/tb3c/scan")
                     if obj.opt_figure
-                    lidaring_draw_now_prediction(obj, 1, obj.time_interval);
+                    lidaring_draw_now_prediction(obj, 1, obj.opt_circle_size);
                     end
 %                 elseif(obj.namespace == "/tb3d/scan")
 %                     lidaring_draw_now_prediction(obj, 1, 0.22 * obj.time_interval);
