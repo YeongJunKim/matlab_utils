@@ -3,7 +3,7 @@ Some utilized function for matlab task.
 
 
 ### inhull.m
-- Checks whether points are included in the convex hole.
+- Checks whether points are included in the convex hull.
 
 ### lidaring.m
 - This is a function required to process lidar data. It provides clustering.
