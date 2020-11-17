@@ -35,6 +35,7 @@ classdef lidaring < handle
         opt_circle_size = 0.3;
         opt_weight = 1;
         opt_angle_offset = 0;
+        opt_NLOS_random_nose = 0;
         %% class info
         namespace = "";
         fig;
@@ -89,6 +90,8 @@ classdef lidaring < handle
                obj.opt_weight = value;
            elseif strcmp(type, "angle_offset")
                obj.opt_angle_offset = value;
+           elseif strcmp(type, "NLOS_random_noise")
+               obj.opt_NLOS_random_nose = value;
            else
            end
         end
@@ -163,7 +166,7 @@ classdef lidaring < handle
                        disp("[lidaring.m] Scan error");
                        fprintf("robot num: %d target index: %d \n", obj.robot_num, i);
                        obj.result_data(:,i,obj.step) = obj.result_data(:,i,obj.step -1);
-                       obj.result_data(:,i,obj.step-2) = normrnd([0 0]', [1,1]');
+                       obj.result_data(:,i,obj.step-2) = normrnd([0 0]', [obj.opt_NLOS_random_nose,obj.opt_NLOS_random_nose]');
                     end
                 % convert distance and atan2 angles
                 obj.result_data_distance_angle(1,i,obj.step) = norm(obj.result_data(:,i,obj.step));
